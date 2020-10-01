@@ -9,20 +9,43 @@ char *lineptr[MAXLINES];
 void Qsort(void *lineptr[], int left, int right,
 	int (*comp)(void *, void *));
 
+void rev(void *lineptr[], int nlines);
+
 int numcmp(char *, char *);
 
 main(int argc, char *argv[])
 {
 	int nlines;
-	int numeric = 0;
+	int numeric = 0, reverse = 0;
+	int c;
 
+	
+	//if (argc > 1 && strcmp(argv[1], "-n"))
+		//numeric=1;
 
-	if (argc > 1 && strcmp(argv[1], "-n"))
-		numeric=1;
-
+	while (--argc>0 && (*++argv)[0]=='-') {
+		while (c = *++argv[0]) {
+			switch (c)
+			{
+				case 'n': numeric=1;
+				break;
+				case 'r': reverse=1;
+				break;
+				default:
+				argc=0;
+				break;
+			}
+		}
+	}
+	if (argc!=0) {
+		printf("%s\n", "Usage: Sorter -r -n");
+		return -1;
+	}
 	if ((nlines = readlines(lineptr, MAXLINES)) > 0) {
 		Qsort((void **)lineptr, 0, nlines-1, 
 			(int (*)(void *, void *))(numeric ? numcmp : strcmp));
+		if (reverse)
+			rev(lineptr, nlines);
 		writelines(lineptr, nlines);
 		return 0;
 	}
@@ -31,6 +54,27 @@ main(int argc, char *argv[])
 		return 1;
 	}
 }
+
+void rev(void *lineptr[], int nlines)
+{
+	int i = nlines -1;
+	int j =0;
+
+	while (i>j)
+	{
+		char *tmp = lineptr[i];
+		lineptr[i] = lineptr[j];
+		lineptr[j] = tmp;
+		i--;
+		j++;
+	}
+	// void *arr[nlines];
+	// while(nlines-- >= 0) {
+	// 	*arr[i] = *lineptr[nlines];
+	// }
+	// lineptr = arr;
+}
+
 void Qsort(void *v[], int left, int right, 
 	int (*comp)(void *, void *)) {
 
